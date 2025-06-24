@@ -7,7 +7,8 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((connection) => {
    // Handle connection
    connection.on("data", (data) => {
-     connection.write("+PONG\r\n");
+    if (data.toString().trim() === "PING") connection.write("+PONG\r\n");
+    else if (data.toString().trim() === "ECHO") connection.write(data);
    });
  });
 //
