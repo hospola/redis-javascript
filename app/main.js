@@ -14,10 +14,22 @@ const server = net.createServer((connection) => {
     if (command[2].toLowerCase() === "ping") connection.write("+PONG\r\n");
     else if (command[2].toLowerCase() === "echo") connection.write('$' + command[4].length + '\r\n' + command[4] + '\r\n');
     else if (command[2].toLowerCase() === "set") {
-      const key = command[4];
-      const value = command[6];
-      keyValueStore.set(key, value);
-      connection.write("+OK\r\n");
+      if (command.length < 9) {
+        const key = command[4];
+        const value = command[6];
+        keyValueStore.set(key, value);
+        connection.write("+OK\r\n");
+      }
+      else if (command[8].toLowerCase() === "px") {
+        const key = command[4];
+        const value = command[6];
+        const expiration = parseInt(command[10], 10);
+        keyValueStore.set(key, value);
+        setTimeout(() => {
+          keyValueStore.delete(key);
+        }, expiration);
+        connection.write("+OK\r\n");
+      }
     }
     else if (command[2].toLowerCase() === "get") {
       const key = command[4];
