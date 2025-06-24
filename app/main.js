@@ -6,9 +6,9 @@ console.log("Logs from your program will appear here!");
 // Uncomment this block to pass the first stage
 const server = net.createServer((connection) => {
    // Handle connection
-   connection.on("data", (data, message) => {
+   connection.on("data", (data) => {
     if (data.toString().trim() === "PING") connection.write("+PONG\r\n");
-    else connection.write(message);
+    else connection.write(data);
    });
  });
 //
