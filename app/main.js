@@ -10,3 +10,9 @@ const server = net.createServer((connection) => {
  });
 //
  server.listen(6379, "127.0.0.1");
+
+ server.on("*1\r\n$4\r\nPING\r\n", (data) => {
+   // Handle PING command
+   console.log("Received PING command");
+   connection.write("+PONG\r\n");
+ });
