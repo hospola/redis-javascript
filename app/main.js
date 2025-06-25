@@ -3,8 +3,17 @@ const net = require("net");
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
-// Uncomment this block to pass the first stage
+const addr = new Map();
+const argumentos = process.argv.slice(2);
+const [fdir, fname] = [argumentos[1] ?? null, argumentos[3] ?? null];
+if (fdir && fname) {
+  addr.set("dir", fdir);
+  addr.set("dbfilename", fname);
+}
+
+
 const server = net.createServer((connection) => {
+
   let keyValueStore = new Map();
    // Handle connection
    connection.on("data", (data) => {
@@ -39,6 +48,10 @@ const server = net.createServer((connection) => {
       } else {
         connection.write("$-1\r\n");
       }
+    }
+    else if (command[2].toLowerCase() === "config" && command[4].toLowerCase() === "get") {
+      if (addr.has(command[6])) connection.write("*2\r\n$" + command[6].length + "\r\n" + command[6] + "\r\n$" + addr.get(command[6]).length + "\r\n" + addr.get(command[6]) + "\r\n");
+      else connection.write("$-1\r\n");
     }
    });
  });
