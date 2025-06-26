@@ -1,33 +1,61 @@
 [![progress-banner](https://backend.codecrafters.io/progress/redis/c3f177ca-b4e8-4660-96fa-eb6fd01300d4)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
-This is a starting point for JavaScript solutions to the
-["Build Your Own Redis" Challenge](https://codecrafters.io/challenges/redis).
+# Mi propia implementación de Redis
 
-In this challenge, you'll build a toy Redis clone that's capable of handling
-basic commands like `PING`, `SET` and `GET`. Along the way we'll learn about
-event loops, the Redis protocol and more.
+Este proyecto tiene como objetivo construir desde cero un servidor Redis en JavaScript. Sirve como ejercicio de aprendizaje para entender el funcionamiento interno de Redis, incluyendo la gestión de estructuras de datos en memoria, persistencia y protocolo de comunicación.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## Instrucciones de instalación
 
-# Passing the first stage
+1. Clona el repositorio:
 
-The entry point for your Redis implementation is in `app/main.js`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+   ```bash
+   git clone <URL-del-repositorio>
+   ```
+2. Instala las dependencias:
 
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+   ```bash
+   npm install
+   ```
+
+## Ejecución
+
+Inicia el servidor Redis con:
+
+```bash
+node app/main.js [--dir <ruta> --dbfilename <archivo>]
 ```
 
-That's all!
+- Opcional: `--dir` y `--dbfilename` permiten especificar directorio y nombre de archivo para persistencia.
+- Por defecto el servidor escucha en `127.0.0.1:6379`.
 
-# Stage 2 & beyond
+## Uso
 
-Note: This section is for stages 2 and beyond.
+Conéctate al servidor con `redis-cli` u otro cliente compatible en el puerto 6379:
 
-1. Ensure you have `node (21)` installed locally
-1. Run `./your_program.sh` to run your Redis server, which is implemented in
-   `app/main.js`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+```bash
+redis-cli -p 6379
+```
+
+Ejemplos de comandos:
+
+- PING:
+  ```redis
+  PING
+  # Respuesta: PONG
+  ```
+- SET y GET:
+  ```redis
+  SET clave valor
+  GET clave
+  # Respuesta: valor
+  ```
+- ECHO:
+  ```redis
+  ECHO "hola"
+  # Respuesta: hola
+  ```
+- CONFIG GET:
+  ```redis
+  CONFIG GET dir
+  CONFIG GET dbfilename
+  ```
