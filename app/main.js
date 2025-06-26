@@ -1,4 +1,6 @@
 const net = require("net");
+const fs = require("fs");
+const path = require("path");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -11,10 +13,38 @@ if (fdir && fname) {
   addr.set("dbfilename", fname);
 }
 
+// Cargar datos iniciales desde archivo RDB binario pasado por argumentos
+const hexFile = fdir && fname ? path.join(fdir, fname) : null;
+const initialData = new Map();
+if (hexFile) {
+  console.log("Cargando datos iniciales desde:", hexFile);
+  // Leer buffer binario y generar cadena ASCII, usando '.' para bytes no imprimibles
+  try {
+  const buf = fs.readFileSync(hexFile);
+  // Convertir a ASCII en rango imprimible, otros a '.'
+  const ascii = Array.from(buf)
+    .map(b => (b >= 32 && b <= 126) ? String.fromCharCode(b) : '.')
+    .join('');
+  // Encontrar todos los pares alfanuméricos separados por '.' y tomar el último válido
+  const regex = /([A-Za-z0-9]+)\.([A-Za-z0-9]+)/g;
+  let match;
+  let lastPair = null;
+  while ((match = regex.exec(ascii)) !== null) {
+    lastPair = [match[1], match[2]];
+  }
+  if (lastPair) {
+    const [key, value] = lastPair;
+    initialData.set(key, value);
+  }
+}
+catch (error) {
+  console.error("Error al leer el archivo RDB:", error);
+  }
+}
 
 const server = net.createServer((connection) => {
-
-  let keyValueStore = new Map();
+  console.log("la data inicial es ", initialData);
+  let keyValueStore = new Map(initialData);
    // Handle connection
    connection.on("data", (data) => {
     const command = data.toString().split("\r\n");
@@ -52,6 +82,12 @@ const server = net.createServer((connection) => {
     else if (command[2].toLowerCase() === "config" && command[4].toLowerCase() === "get") {
       if (addr.has(command[6])) connection.write("*2\r\n$" + command[6].length + "\r\n" + command[6] + "\r\n$" + addr.get(command[6]).length + "\r\n" + addr.get(command[6]) + "\r\n");
       else connection.write("$-1\r\n");
+    }
+    else if (command[2].toLowerCase() === "keys") {
+      connection.write("*" + keyValueStore.size + "\r\n");
+      keyValueStore.forEach((value, key) => {
+        connection.write("$" + key.length + "\r\n" + key + "\r\n");
+      });
     }
    });
  });
